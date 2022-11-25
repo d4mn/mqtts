@@ -1,28 +1,5 @@
-import {
-    ExecuteDelayed,
-    ExecutePeriodically,
-    IncomingListenMessage,
-    ListenOptions,
-    ListenSubscribeOptions,
-    MqttClientConstructorOptions,
-    MqttSubscription,
-    RegisterClientOptions,
-    Resolvable,
-    StopExecuting,
-    TimerRef,
-} from './mqtt.types';
-import {
-    incomingPingFlow,
-    incomingPublishFlow,
-    outgoingConnectFlow,
-    outgoingDisconnectFlow,
-    outgoingPingFlow,
-    outgoingPublishFlow,
-    outgoingSubscribeFlow,
-    outgoingUnsubscribeFlow,
-    PacketFlowData,
-    PacketFlowFunc,
-} from './flow';
+import { ExecuteDelayed, ExecutePeriodically, IncomingListenMessage, ListenOptions, ListenSubscribeOptions, MqttClientConstructorOptions, MqttSubscription, RegisterClientOptions, Resolvable, StopExecuting, TimerRef } from './mqtt.types';
+import { incomingPingFlow, incomingPublishFlow, outgoingConnectFlow, outgoingDisconnectFlow, outgoingPingFlow, outgoingPublishFlow, outgoingSubscribeFlow, outgoingUnsubscribeFlow, PacketFlowData, PacketFlowFunc } from './flow';
 import { MqttParseResult, MqttTransformer } from './mqtt.parser';
 import { TlsTransport, Transport } from './transport';
 import {
@@ -39,7 +16,7 @@ import {
     SubscribeReturnCode,
 } from './packets';
 import { MqttMessageOutgoing } from './mqtt.message';
-import { AbortError, ConnectError, FlowStoppedError, IllegalStateError, UnexpectedPacketError } from './errors';
+import { AbortError, ActiveFlowError, ConnectError, FlowStoppedError, IllegalStateError, UnexpectedPacketError } from './errors';
 import { pipeline, Writable } from 'stream';
 import { EventMapping, PacketType, packetTypeToString } from './mqtt.constants';
 import { MqttBaseClient } from './mqtt.base-client';
@@ -48,10 +25,7 @@ import { createDefaultPacketLogger, createFlowCounter, stringifyObject, toMqttTo
 import debug = require('debug');
 import { MqttsReconnectStrategy, MqttsReconnectStrategyDefault } from './reconnect-strategy';
 
-export class MqttClient<
-    ReadMap extends PacketReadResultMap = DefaultPacketReadResultMap,
-    WriteMap extends PacketWriteOptionsMap = DefaultPacketWriteOptions,
-> extends MqttBaseClient<ReadMap, WriteMap> {
+export class MqttClient<ReadMap extends PacketReadResultMap = DefaultPacketReadResultMap, WriteMap extends PacketWriteOptionsMap = DefaultPacketWriteOptions> extends MqttBaseClient<ReadMap, WriteMap> {
     private mqttDebug = debug('mqtt:client');
     private receiveDebug = this.mqttDebug.extend('packet');
     private pingDebug = this.mqttDebug.extend('ping');
@@ -92,9 +66,7 @@ export class MqttClient<
     constructor(options: MqttClientConstructorOptions<ReadMap, WriteMap>) {
         super();
         if (typeof options.autoReconnect === 'boolean') {
-            this.reconnectStrategy = options.autoReconnect
-                ? new MqttsReconnectStrategyDefault()
-                : new MqttsReconnectStrategyDefault(0);
+            this.reconnectStrategy = options.autoReconnect ? new MqttsReconnectStrategyDefault() : new MqttsReconnectStrategyDefault(0);
         } else {
             this.reconnectStrategy = options.autoReconnect;
         }
@@ -128,16 +100,14 @@ export class MqttClient<
             );
     }
 
-    private async _connect(
-        options?: Resolvable<RegisterClientOptions>,
-    ): Promise<undefined | Error | string | ConnectResponsePacket> {
+    private async _connect(options?: Resolvable<RegisterClientOptions>): Promise<undefined | Error | string | ConnectResponsePacket> {
         this.expectCreated();
         this.mqttDebug(`Connecting using transport "${this.transport.constructor.name}"`);
         this.connectResolver = options;
         this.setConnecting();
         try {
             await this.transport.connect();
-        } catch (e) {
+        } catch (e: any) {
             this.mqttDebug(`Transport connect error ("${this.transport.constructor.name}")`, e.message);
             const shouldReconnect = this.reconnectStrategy?.check();
             await this.setDisconnected(e);
@@ -156,7 +126,7 @@ export class MqttClient<
     public async connect(options?: Resolvable<RegisterClientOptions>) {
         try {
             await this._connect(options);
-        } catch (e) {
+        } catch (e: any) {
             this.mqttDebug(`Connection error`, e);
             this.emitError(e);
         }
@@ -180,9 +150,7 @@ export class MqttClient<
             err => {
                 if (err) this.emitError(err);
                 if (!this.disconnected) {
-                    (err ? this.setDisconnected(err) : this.setDisconnected('Pipeline finished')).catch(e =>
-                        this.emitWarning(e),
-                    );
+                    (err ? this.setDisconnected(err) : this.setDisconnected('Pipeline finished')).catch(e => this.emitWarning(e));
                 }
             },
         );
@@ -193,9 +161,7 @@ export class MqttClient<
     }
 
     public subscribe(subscription: MqttSubscription): Promise<SubscribeReturnCode> {
-        return this.startFlow(
-            outgoingSubscribeFlow(subscription) as PacketFlowFunc<ReadMap, WriteMap, SubscribeReturnCode>,
-        );
+        return this.startFlow(outgoingSubscribeFlow(subscription) as PacketFlowFunc<ReadMap, WriteMap, SubscribeReturnCode>);
     }
 
     public unsubscribe(subscription: MqttSubscription): Promise<void> {
@@ -204,25 +170,17 @@ export class MqttClient<
 
     public async disconnect(force = false): Promise<void> {
         if (!force) {
-            return this.startFlow(outgoingDisconnectFlow() as PacketFlowFunc<ReadMap, WriteMap, void>).then(
-                async () => {
-                    await this.setDisconnected('Soft disconnect');
-                },
-            );
+            return this.startFlow(outgoingDisconnectFlow() as PacketFlowFunc<ReadMap, WriteMap, void>).then(async () => {
+                await this.setDisconnected('Soft disconnect');
+            });
         } else {
             await this.setDisconnected('Forced disconnect');
         }
     }
 
     public listenSubscribe<T = IncomingListenMessage>(topic: string, handlerFn: HandlerFn<T>): Promise<RemoveHandlerFn>;
-    public listenSubscribe<T = IncomingListenMessage, Params extends Record<string, string> = Record<string, string>>(
-        options: ListenSubscribeOptions<T, Params>,
-        handlerFn: HandlerFn<T>,
-    ): Promise<RemoveHandlerFn>;
-    public listenSubscribe<T = IncomingListenMessage, Params extends Record<string, string> = Record<string, string>>(
-        options: string | ListenSubscribeOptions<T, Params>,
-        handlerFn: HandlerFn<T>,
-    ): Promise<RemoveHandlerFn> {
+    public listenSubscribe<T = IncomingListenMessage, Params extends Record<string, string> = Record<string, string>>(options: ListenSubscribeOptions<T, Params>, handlerFn: HandlerFn<T>): Promise<RemoveHandlerFn>;
+    public listenSubscribe<T = IncomingListenMessage, Params extends Record<string, string> = Record<string, string>>(options: string | ListenSubscribeOptions<T, Params>, handlerFn: HandlerFn<T>): Promise<RemoveHandlerFn> {
         const listener = typeof options === 'string' ? { topic: options } : options;
         return this.subscribe({
             ...listener.subscriptionInfo,
@@ -231,14 +189,8 @@ export class MqttClient<
     }
 
     public listen<T>(topic: string, handlerFn: HandlerFn<T>): RemoveHandlerFn;
-    public listen<T, Params extends Record<string, string>>(
-        options: ListenOptions<T, Params>,
-        handlerFn: HandlerFn<T>,
-    ): RemoveHandlerFn;
-    public listen<T, Params extends Record<string, string>>(
-        options: string | ListenOptions<T, Params>,
-        handlerFn: HandlerFn<T>,
-    ): RemoveHandlerFn {
+    public listen<T, Params extends Record<string, string>>(options: ListenOptions<T, Params>, handlerFn: HandlerFn<T>): RemoveHandlerFn;
+    public listen<T, Params extends Record<string, string>>(options: string | ListenOptions<T, Params>, handlerFn: HandlerFn<T>): RemoveHandlerFn {
         const listener: ListenOptions<T, Params> = typeof options === 'string' ? { topic: options } : options;
         const [topicFilter, paramMatcher] = toMqttTopicFilter(listener.topic);
         return this.messageListener.addHandler({
@@ -274,6 +226,9 @@ export class MqttClient<
 
             if (!data.finished) {
                 this.activeFlows.push(data);
+                if (this.activeFlows.length > 10) {
+                    this.emitWarning(new ActiveFlowError('Too many active flows', this.activeFlows.length));
+                }
             }
         });
         (promise as any).flowId = flowId;
@@ -349,9 +304,7 @@ export class MqttClient<
                 .catch(() => undefined);
         }
 
-        options.signal?.addEventListener('abort', () =>
-            this.stopFlow(connectPromiseFlow.flowId, new AbortError('Connecting aborted')),
-        );
+        options.signal?.addEventListener('abort', () => this.stopFlow(connectPromiseFlow.flowId, new AbortError('Connecting aborted')));
 
         return connectPromiseFlow;
     }
@@ -463,8 +416,7 @@ export class MqttClient<
     }
 
     protected logReceivedPacket(packet: { type: PacketType; data: any }): void {
-        if (packet.type !== PacketType.PingReq && packet.type !== PacketType.PingResp)
-            this.receiveDebug(`Received ${stringifyObject(packet.data)}`);
+        if (packet.type !== PacketType.PingReq && packet.type !== PacketType.PingResp) this.receiveDebug(`Received ${stringifyObject(packet.data)}`);
     }
 
     protected reset(): void {

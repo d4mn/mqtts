@@ -3,24 +3,13 @@ import { MqttMessageOutgoing } from '../mqtt.message';
 import { MqttSubscription } from '../mqtt.types';
 import { PacketFlowFunc } from './packet-flow';
 import { generateIdentifier } from '../mqtt.packet';
-import {
-    isConnAck,
-    isPingResp,
-    isPubAck,
-    isPubComp,
-    isPubRec,
-    isSubAck,
-    isUnsubAck,
-    toBuffer,
-} from '../mqtt.utilities';
+import { isConnAck, isPingResp, isPubAck, isPubComp, isPubRec, isSubAck, isUnsubAck, toBuffer } from '../mqtt.utilities';
 import { DefaultPacketReadResultMap } from '../packets/packet-reader';
 import { DefaultPacketWriteOptions, defaultWrite } from '../packets/packet-writer';
 import { PacketType } from '../mqtt.constants';
 import { SubscribeError } from '../errors';
 
-export function outgoingConnectFlow(
-    options: ConnectRequestOptions,
-): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, ConnectResponsePacket> {
+export function outgoingConnectFlow(options: ConnectRequestOptions): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, ConnectResponsePacket> {
     const finalOptions = {
         protocolLevel: 4,
         clientId: 'mqtt_' + Math.round(Math.random() * 10e5),
@@ -52,10 +41,7 @@ export function outgoingPingFlow(): PacketFlowFunc<DefaultPacketReadResultMap, D
     });
 }
 
-export function outgoingPublishFlow(
-    message: MqttMessageOutgoing,
-    _identifier?: number,
-): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, MqttMessageOutgoing> {
+export function outgoingPublishFlow(message: MqttMessageOutgoing, _identifier?: number): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, MqttMessageOutgoing> {
     const id = _identifier ?? generateIdentifier();
     let receivedPubRec = false;
     return success => ({
@@ -96,10 +82,7 @@ export function outgoingPublishFlow(
     });
 }
 
-export function outgoingSubscribeFlow(
-    subscription: MqttSubscription,
-    identifier?: number,
-): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, SubscribeReturnCode> {
+export function outgoingSubscribeFlow(subscription: MqttSubscription, identifier?: number): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, SubscribeReturnCode> {
     const id = identifier ?? generateIdentifier();
     return (success, error) => ({
         start: () =>
@@ -112,20 +95,13 @@ export function outgoingSubscribeFlow(
             if (!packet.anyError) {
                 success(packet.returnCodes[0]);
             } else {
-                error(
-                    new SubscribeError(
-                        `Failed to subscribe to ${subscription.topic} - Return Codes: ${packet.returnCodes.join(', ')}`,
-                    ),
-                );
+                error(new SubscribeError(`Failed to subscribe to ${subscription.topic} - Return Codes: ${packet.returnCodes.join(', ')}`));
             }
         },
     });
 }
 
-export function outgoingUnsubscribeFlow(
-    subscription: MqttSubscription,
-    identifier?: number,
-): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, void> {
+export function outgoingUnsubscribeFlow(subscription: MqttSubscription, identifier?: number): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, void> {
     const id = identifier ?? generateIdentifier();
     return success => ({
         start: () =>

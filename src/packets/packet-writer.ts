@@ -17,10 +17,7 @@ export interface PacketLogger {
 }
 
 export class PacketWriter<WriteOptions extends PacketWriteOptionsMap = DefaultPacketWriteOptions> {
-    constructor(
-        protected logger: PacketLogger,
-        protected writeMap: PacketWriteMap<WriteOptions> = DefaultPacketWriteMap,
-    ) {}
+    constructor(protected logger: PacketLogger, protected writeMap: PacketWriteMap<WriteOptions> = DefaultPacketWriteMap) {}
 
     write<T extends PacketType>(type: T, options?: WriteOptions[T]): Buffer {
         const packetStream = PacketStream.empty();
@@ -43,10 +40,7 @@ export class PacketWriter<WriteOptions extends PacketWriteOptionsMap = DefaultPa
     }
 }
 
-export function defaultWrite<T extends PacketType>(
-    type: T,
-    options?: DefaultPacketWriteOptions[T],
-): WriteData<DefaultPacketWriteOptions, T> {
+export function defaultWrite<T extends PacketType>(type: T, options?: DefaultPacketWriteOptions[T]): WriteData<DefaultPacketWriteOptions, T> {
     return {
         type,
         options,

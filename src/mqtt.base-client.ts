@@ -18,7 +18,7 @@ export class MqttBaseClient<
     ReadMap extends PacketReadResultMap,
     // TODO: fix in next major version -- would break existing code
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    WriteMap extends PacketWriteOptionsMap,
+    WriteMap extends PacketWriteOptionsMap
 > extends EventEmitter<
     {
         error: (e: Error) => void;
@@ -105,8 +105,7 @@ export class MqttBaseClient<
 
     protected emitError = (e: Error) => this.emit('error', e);
 
-    protected emitDisconnect = (event: { reason?: string | Error; reconnect: boolean }) =>
-        this.emit('disconnect', event);
+    protected emitDisconnect = (event: { reason?: string | Error; reconnect: boolean }) => this.emit('disconnect', event);
 
     protected emitConnect = (packet: ReadMap[PacketType.ConnAck]) => this.emit('connect', packet);
 
@@ -116,9 +115,7 @@ export class MqttBaseClient<
         if (this.sate === StateId.Created || this.sate === StateId.Disconnected) {
             this.sate = StateId.Created;
         } else {
-            throw new Error(
-                `Invalid state: Resetting requires the client to be Disconnected or Created (current: ${this.current})`,
-            );
+            throw new Error(`Invalid state: Resetting requires the client to be Disconnected or Created (current: ${this.current})`);
         }
     }
 

@@ -6,3 +6,4 @@ export * from './subscribe.error';
 export * from './flow-stopped.error';
 export * from './illegal-state.error';
 export * from './abort.error';
+export * from './activeflow.error';

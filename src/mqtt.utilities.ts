@@ -1,15 +1,5 @@
 import { Resolvable } from './mqtt.types';
-import {
-    ConnectResponsePacket,
-    PingResponsePacket,
-    PublishAckPacket,
-    PublishCompletePacket,
-    PublishReceivedPacket,
-    PublishReleasePacket,
-    PublishRequestPacket,
-    SubscribeResponsePacket,
-    UnsubscribeResponsePacket,
-} from './packets';
+import { ConnectResponsePacket, PingResponsePacket, PublishAckPacket, PublishCompletePacket, PublishReceivedPacket, PublishReleasePacket, PublishRequestPacket, SubscribeResponsePacket, UnsubscribeResponsePacket } from './packets';
 import { PacketType, packetTypeToString } from './mqtt.constants';
 
 export function matchTopic(baseTopic: string, incomingTopic: string): boolean {
@@ -63,10 +53,8 @@ export const isPubAck = (target: unknown): target is PublishAckPacket => target 
 export const isPubRec = (target: unknown): target is PublishReceivedPacket => target instanceof PublishReceivedPacket;
 export const isPubRel = (target: unknown): target is PublishReleasePacket => target instanceof PublishReleasePacket;
 export const isPubComp = (target: unknown): target is PublishCompletePacket => target instanceof PublishCompletePacket;
-export const isSubAck = (target: unknown): target is SubscribeResponsePacket =>
-    target instanceof SubscribeResponsePacket;
-export const isUnsubAck = (target: unknown): target is UnsubscribeResponsePacket =>
-    target instanceof UnsubscribeResponsePacket;
+export const isSubAck = (target: unknown): target is SubscribeResponsePacket => target instanceof SubscribeResponsePacket;
+export const isUnsubAck = (target: unknown): target is UnsubscribeResponsePacket => target instanceof UnsubscribeResponsePacket;
 export const isPingResp = (target: unknown): target is PingResponsePacket => target instanceof PingResponsePacket;
 
 export async function resolve<T extends Record<string, unknown>>(resolvable: Resolvable<T>): Promise<T> {
