@@ -5,10 +5,7 @@ import { expectRemainingLength } from '../mqtt.utilities';
 
 export class PublishCompletePacket extends IdentifierPacket {}
 
-export function writePublishCompletePacket(
-    stream: PacketStream,
-    options: PublishCompletePacketOptions,
-): PacketWriteResult {
+export function writePublishCompletePacket(stream: PacketStream, options: PublishCompletePacketOptions): PacketWriteResult {
     stream.writeWord(options.identifier);
     return { identifier: options.identifier };
 }

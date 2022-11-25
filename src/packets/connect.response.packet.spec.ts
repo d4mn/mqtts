@@ -6,11 +6,7 @@ import { assert } from 'chai';
 describe('ConnectResponsePacket', function () {
     describe('readConnectResponsePacket', function () {
         it('should read a basic packet', function () {
-            assertPacket(
-                readConnectResponsePacket(PacketStream.fromBuffer(Buffer.from('0100', 'hex')), 2),
-                ConnectResponsePacket,
-                new ConnectResponsePacket(1, ConnectReturnCode.Accepted),
-            );
+            assertPacket(readConnectResponsePacket(PacketStream.fromBuffer(Buffer.from('0100', 'hex')), 2), ConnectResponsePacket, new ConnectResponsePacket(1, ConnectReturnCode.Accepted));
         });
         it('should throw on invalid length', function () {
             assert.throws(() => readConnectResponsePacket(PacketStream.fromBuffer(Buffer.from('01', 'hex')), 1));
@@ -37,10 +33,7 @@ describe('ConnectResponsePacket', function () {
                 assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.Accepted).isSuccess, true);
             });
             it('should return false if the code is != 0', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.UnacceptableProtocolVersion).isSuccess,
-                    false,
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.UnacceptableProtocolVersion).isSuccess, false);
             });
         });
 
@@ -49,34 +42,19 @@ describe('ConnectResponsePacket', function () {
                 assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.Accepted).errorName, 'Accepted');
             });
             it('should return a proper error name for the code 1', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.UnacceptableProtocolVersion).errorName,
-                    'UnacceptableProtocolVersion',
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.UnacceptableProtocolVersion).errorName, 'UnacceptableProtocolVersion');
             });
             it('should return a proper error name for the code 2', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.IdentifierRejected).errorName,
-                    'IdentifierRejected',
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.IdentifierRejected).errorName, 'IdentifierRejected');
             });
             it('should return a proper error name for the code 3', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.ServerUnavailable).errorName,
-                    'ServerUnavailable',
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.ServerUnavailable).errorName, 'ServerUnavailable');
             });
             it('should return a proper error name for the code 4', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.BadUsernameOrPassword).errorName,
-                    'BadUsernameOrPassword',
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.BadUsernameOrPassword).errorName, 'BadUsernameOrPassword');
             });
             it('should return a proper error name for the code 5', function () {
-                assert.strictEqual(
-                    new ConnectResponsePacket(0, ConnectReturnCode.NotAuthorized).errorName,
-                    'NotAuthorized',
-                );
+                assert.strictEqual(new ConnectResponsePacket(0, ConnectReturnCode.NotAuthorized).errorName, 'NotAuthorized');
             });
         });
     });

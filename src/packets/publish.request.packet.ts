@@ -45,11 +45,7 @@ export function writePublishRequestPacket(stream: PacketStream, options: Publish
     };
 }
 
-export function readPublishRequestPacket(
-    stream: PacketStream,
-    remainingLength: number,
-    flags: number,
-): PublishRequestPacket {
+export function readPublishRequestPacket(stream: PacketStream, remainingLength: number, flags: number): PublishRequestPacket {
     const startPos = stream.position;
     const topic = stream.readString();
     const identifier = flags & 0b0110 ? stream.readWord() : undefined;

@@ -3,12 +3,7 @@ import { PacketStream } from './packet-stream';
 import { EndOfStreamError, MalformedPacketError, UnexpectedPacketError } from './errors';
 import { Transform, TransformCallback } from 'stream';
 import { Debugger } from 'debug';
-import {
-    DefaultPacketReadMap,
-    DefaultPacketReadResultMap,
-    PacketReadMap,
-    PacketReadResultMap,
-} from './packets/packet-reader';
+import { DefaultPacketReadMap, DefaultPacketReadResultMap, PacketReadMap, PacketReadResultMap } from './packets/packet-reader';
 
 export interface MqttParseResult<ReadMap extends PacketReadResultMap, T extends PacketType> {
     type: T;
@@ -52,11 +47,7 @@ export class MqttTransformer<ReadMap extends PacketReadResultMap = DefaultPacket
 
             const packetFn = this.mapping[type];
             if (!packetFn) {
-                callback(
-                    new UnexpectedPacketError(
-                        `No packet found for ${type}; @${stream.position - 1} len: ${stream.length}`,
-                    ),
-                );
+                callback(new UnexpectedPacketError(`No packet found for ${type}; @${stream.position - 1} len: ${stream.length}`));
                 return;
             }
             let remainingLength = -1;
@@ -70,23 +61,15 @@ export class MqttTransformer<ReadMap extends PacketReadResultMap = DefaultPacket
                 });
                 stream.cut();
                 startPos = stream.position;
-            } catch (e) {
+            } catch (e: any) {
                 if (e instanceof EndOfStreamError) {
-                    this.options.debug?.(
-                        `EOS:\n  ${remainingLength} got: ${stream.length} (+) ${chunk.byteLength};\n  return: ${startPos};`,
-                    );
+                    this.options.debug?.(`EOS:\n  ${remainingLength} got: ${stream.length} (+) ${chunk.byteLength};\n  return: ${startPos};`);
                     stream.position = startPos;
                     this.internalStream = stream.cut();
                     callback();
                     return;
                 } else {
-                    callback(
-                        new MalformedPacketError(
-                            `Error in parser (type: ${packetTypeToString(type)}): ${
-                                e.message || e
-                            } - stream: ${stream.data.toString('base64')}`,
-                        ),
-                    );
+                    callback(new MalformedPacketError(`Error in parser (type: ${packetTypeToString(type)}): ${e.message || e} - stream: ${stream.data.toString('base64')}`));
                     return;
                 }
             }

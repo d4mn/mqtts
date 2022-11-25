@@ -122,9 +122,7 @@ export class PacketStream {
     // Read
     public read(len: number): Buffer {
         if (this.position > this.length || len > this.length - this.position) {
-            throw new EndOfStreamError(
-                `End of stream reached when trying to read ${len} bytes. content length=${this.length}, position=${this.position}`,
-            );
+            throw new EndOfStreamError(`End of stream reached when trying to read ${len} bytes. content length=${this.length}, position=${this.position}`);
         }
 
         const buf = this._data.slice(this._position, this.position + len);
@@ -165,9 +163,7 @@ export class PacketStream {
 
             value += (encodedByte & 0x7f) * multiplier;
             if (multiplier > 128 * 128 * 128) {
-                throw new Error(
-                    `Invalid variable byte integer ${this.position}/${this.length}; currentValue: ${value}`,
-                );
+                throw new Error(`Invalid variable byte integer ${this.position}/${this.length}; currentValue: ${value}`);
             }
             multiplier *= 0x80;
         } while ((encodedByte & 0x80) !== 0);

@@ -3,22 +3,14 @@ import { MqttTransformer } from './mqtt.parser';
 import { Transport } from './transport';
 import { XOR } from 'ts-xor';
 import { MqttMessage } from './mqtt.message';
-import {
-    DefaultPacketReadResultMap,
-    PacketReadMap,
-    PacketReadResultMap,
-    DefaultPacketWriteOptions,
-    PacketWriteMap,
-    PacketWriteOptionsMap,
-    PacketWriter,
-} from './packets';
+import { DefaultPacketReadResultMap, PacketReadMap, PacketReadResultMap, DefaultPacketWriteOptions, PacketWriteMap, PacketWriteOptionsMap, PacketWriter } from './packets';
 import { TransformerFn, ValidatorFn } from './mqtt.listener';
 import { MqttsReconnectStrategy } from './reconnect-strategy';
 
-export type MqttClientConstructorOptions<
-    ReadMap extends PacketReadResultMap = DefaultPacketReadResultMap,
-    WriteMap extends PacketWriteOptionsMap = DefaultPacketWriteOptions,
-> = XOR<{ transport: Transport<unknown> }, { host: string; port: number; enableTrace?: boolean }> & {
+export type MqttClientConstructorOptions<ReadMap extends PacketReadResultMap = DefaultPacketReadResultMap, WriteMap extends PacketWriteOptionsMap = DefaultPacketWriteOptions> = XOR<
+    { transport: Transport<unknown> },
+    { host: string; port: number; enableTrace?: boolean }
+> & {
     readMap?: PacketReadMap<ReadMap>;
     createTransformer?: () => MqttTransformer<ReadMap>;
     writeMap?: PacketWriteMap<WriteMap>;
@@ -53,8 +45,7 @@ export interface ListenOptions<TOut, Params extends Record<string, string>> {
     transformer?: TransformerFn<TOut, Params>;
 }
 
-export interface ListenSubscribeOptions<TOut, Params extends Record<string, string>>
-    extends ListenOptions<TOut, Params> {
+export interface ListenSubscribeOptions<TOut, Params extends Record<string, string>> extends ListenOptions<TOut, Params> {
     subscriptionInfo?: Partial<MqttSubscription>;
 }
 

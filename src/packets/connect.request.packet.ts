@@ -25,11 +25,7 @@ export interface RequiredConnectRequestOptions {
 
 export function writeConnectPacket(stream: PacketStream, options: RequiredConnectRequestOptions): PacketWriteResult {
     // Variable Header
-    stream
-        .writeString(options.protocolName)
-        .writeByte(options.protocolLevel)
-        .writeByte(makeFlags(options))
-        .writeWord(options.keepAlive);
+    stream.writeString(options.protocolName).writeByte(options.protocolLevel).writeByte(makeFlags(options)).writeWord(options.keepAlive);
 
     // Payload
     stream.writeString(options.clientId);
@@ -42,10 +38,7 @@ export function writeConnectPacket(stream: PacketStream, options: RequiredConnec
 
 export function makeFlags(options: ConnectRequestOptions): number {
     if (!options) return 0;
-    if (notUndefined(options.password) && !notUndefined(options.username))
-        throw new MalformedPacketError(
-            'MQTT-3.1.2-22 If the User Name Flag is set to 0, the Password Flag MUST be set to 0',
-        );
+    if (notUndefined(options.password) && !notUndefined(options.username)) throw new MalformedPacketError('MQTT-3.1.2-22 If the User Name Flag is set to 0, the Password Flag MUST be set to 0');
 
     let flags = 0;
     if (notUndefined(options.username)) flags |= 0x1 << 7;

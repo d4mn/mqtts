@@ -6,11 +6,7 @@ import { assert } from 'chai';
 describe('PublishReleasePacket', function () {
     describe('readPublishReleasePacket', function () {
         it('should read properly', function () {
-            assertPacket(
-                readPublishReleasePacket(PacketStream.fromHex('000a'), 2),
-                PublishReleasePacket,
-                new PublishReleasePacket(10),
-            );
+            assertPacket(readPublishReleasePacket(PacketStream.fromHex('000a'), 2), PublishReleasePacket, new PublishReleasePacket(10));
         });
         it('should fail on invalid remaining length', function () {
             assert.throws(() => readPublishReleasePacket(PacketStream.fromHex('0a'), 1));

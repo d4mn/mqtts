@@ -178,32 +178,16 @@ describe('PublishRequestPacket', function () {
 
     describe('readPublishRequestPacket', function () {
         it('should read a minimal packet', function () {
-            assertPacket(
-                readPublishRequestPacket(PacketStream.fromHex('000141'), 3, 0),
-                PublishRequestPacket,
-                new PublishRequestPacket(0, 'A', undefined, Buffer.alloc(0)),
-            );
+            assertPacket(readPublishRequestPacket(PacketStream.fromHex('000141'), 3, 0), PublishRequestPacket, new PublishRequestPacket(0, 'A', undefined, Buffer.alloc(0)));
         });
         it('should read the payload', function () {
-            assertPacket(
-                readPublishRequestPacket(PacketStream.fromHex('00014142'), 4, 0),
-                PublishRequestPacket,
-                new PublishRequestPacket(0, 'A', undefined, Buffer.from('42', 'hex')),
-            );
+            assertPacket(readPublishRequestPacket(PacketStream.fromHex('00014142'), 4, 0), PublishRequestPacket, new PublishRequestPacket(0, 'A', undefined, Buffer.from('42', 'hex')));
         });
         it('should support flags', function () {
-            assertPacket(
-                readPublishRequestPacket(PacketStream.fromHex('0001410001'), 5, 0b0010),
-                PublishRequestPacket,
-                new PublishRequestPacket(0b0010, 'A', 1, Buffer.alloc(0)),
-            );
+            assertPacket(readPublishRequestPacket(PacketStream.fromHex('0001410001'), 5, 0b0010), PublishRequestPacket, new PublishRequestPacket(0b0010, 'A', 1, Buffer.alloc(0)));
         });
         it('should support flags and a payload', function () {
-            assertPacket(
-                readPublishRequestPacket(PacketStream.fromHex('000141000142'), 6, 0b0100),
-                PublishRequestPacket,
-                new PublishRequestPacket(0b0100, 'A', 1, Buffer.from('42', 'hex')),
-            );
+            assertPacket(readPublishRequestPacket(PacketStream.fromHex('000141000142'), 6, 0b0100), PublishRequestPacket, new PublishRequestPacket(0b0100, 'A', 1, Buffer.from('42', 'hex')));
         });
     });
     describe('model', function () {

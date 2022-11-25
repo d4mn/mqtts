@@ -15,15 +15,7 @@ export class SubscribeResponsePacket extends IdentifierPacket {
 export function readSubscribeResponsePacket(stream: PacketStream, remainingLength: number): SubscribeResponsePacket {
     const identifier = stream.readWord();
     const returnCodes = Array.from(stream.read(remainingLength - 2));
-    if (
-        !returnCodes.every(
-            code =>
-                code === SubscribeReturnCode.MaxQoS0 ||
-                code === SubscribeReturnCode.MaxQoS1 ||
-                code === SubscribeReturnCode.MaxQoS2 ||
-                code === SubscribeReturnCode.Fail,
-        )
-    ) {
+    if (!returnCodes.every(code => code === SubscribeReturnCode.MaxQoS0 || code === SubscribeReturnCode.MaxQoS1 || code === SubscribeReturnCode.MaxQoS2 || code === SubscribeReturnCode.Fail)) {
         throw new MalformedPacketError('Received invalid return codes');
     }
     return new SubscribeResponsePacket(identifier, returnCodes);

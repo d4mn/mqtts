@@ -14,10 +14,7 @@ export function incomingPingFlow(): PacketFlowFunc<DefaultPacketReadResultMap, D
     });
 }
 
-export function incomingPublishFlow(
-    message: MqttMessage,
-    identifier: number,
-): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, MqttMessage> {
+export function incomingPublishFlow(message: MqttMessage, identifier: number): PacketFlowFunc<DefaultPacketReadResultMap, DefaultPacketWriteOptions, MqttMessage> {
     return success => ({
         start: () => {
             let packet = undefined;

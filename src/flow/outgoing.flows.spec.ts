@@ -1,12 +1,5 @@
 import { ignoreEverything } from '../../test/utilities';
-import {
-    outgoingConnectFlow,
-    outgoingDisconnectFlow,
-    outgoingPingFlow,
-    outgoingPublishFlow,
-    outgoingSubscribeFlow,
-    outgoingUnsubscribeFlow,
-} from './outgoing.flows';
+import { outgoingConnectFlow, outgoingDisconnectFlow, outgoingPingFlow, outgoingPublishFlow, outgoingSubscribeFlow, outgoingUnsubscribeFlow } from './outgoing.flows';
 import {
     ConnectResponsePacket,
     ConnectReturnCode,

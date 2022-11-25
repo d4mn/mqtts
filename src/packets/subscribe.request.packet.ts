@@ -8,8 +8,7 @@ export interface SubscribePacketOptions {
 
 export function writeSubscribePacket(stream: PacketStream, options: SubscribePacketOptions): PacketWriteResult {
     stream.writeWord(options.identifier);
-    if (options.subscriptions.length === 0)
-        throw new Error('The payload of a SUBSCRIBE packet MUST contain at least one Topic Filter / QoS pair');
+    if (options.subscriptions.length === 0) throw new Error('The payload of a SUBSCRIBE packet MUST contain at least one Topic Filter / QoS pair');
     for (const sub of options.subscriptions) {
         if (sub.qos && sub.qos > 2) throw new Error('invalid QoS');
         stream.writeString(sub.topic).writeByte(sub.qos ?? 0);

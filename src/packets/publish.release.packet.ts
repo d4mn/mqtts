@@ -5,10 +5,7 @@ import { expectRemainingLength } from '../mqtt.utilities';
 
 export class PublishReleasePacket extends IdentifierPacket {}
 
-export function writePublishReleasePacket(
-    stream: PacketStream,
-    options: PublishReleasedPacketOptions,
-): PacketWriteResult {
+export function writePublishReleasePacket(stream: PacketStream, options: PublishReleasedPacketOptions): PacketWriteResult {
     stream.writeWord(options.identifier);
     return { flags: 2, identifier: options.identifier };
 }

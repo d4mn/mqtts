@@ -31,9 +31,7 @@ export class MqttListener {
 export type RemoveHandlerFn = () => void;
 export type HandlerFn<T = MessageWithParams> = (message: T) => void;
 export type ValidatorFn<Params extends Record<string, string>> = (message: MqttMessage, params: Params) => boolean;
-export type TransformerFn<TOut, Params extends Record<string, string>> = (
-    message: IncomingListenMessage<Params>,
-) => TOut | Promise<TOut>;
+export type TransformerFn<TOut, Params extends Record<string, string>> = (message: IncomingListenMessage<Params>) => TOut | Promise<TOut>;
 
 export type MessageWithParams<T extends Record<string, string> = Record<string, string>> = MqttMessage & { params: T };
 
