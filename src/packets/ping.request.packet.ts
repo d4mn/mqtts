@@ -4,10 +4,10 @@ import { expectRemainingLength } from '../mqtt.utilities';
 export class PingRequestPacket {}
 
 export function writePingRequestPacket(): PacketWriteResult {
-    return {};
+  return {};
 }
 
 export function readPingRequestPacket(_: unknown, remaining: number): PingRequestPacket {
-    expectRemainingLength(remaining, 0);
-    return new PingRequestPacket();
+  expectRemainingLength(remaining, 0);
+  return new PingRequestPacket();
 }

@@ -13,31 +13,31 @@ import { PingRequestPacket, readPingRequestPacket } from './ping.request.packet'
 
 export type PacketReadResultMap = { [x in PacketType]: unknown };
 export type PacketReadMap<Results extends PacketReadResultMap> = {
-    [P in PacketType]?: (stream: PacketStream, remainingLength: number, flags: number) => Results[P];
+  [P in PacketType]?: (stream: PacketStream, remainingLength: number, flags: number) => Results[P];
 };
 
 export interface DefaultPacketReadResultMap extends PacketReadResultMap {
-    [PacketType.ConnAck]: ConnectResponsePacket;
-    [PacketType.Publish]: PublishRequestPacket;
-    [PacketType.PubAck]: PublishAckPacket;
-    [PacketType.PubRel]: PublishReleasePacket;
-    [PacketType.PubRec]: PublishReceivedPacket;
-    [PacketType.PubComp]: PublishCompletePacket;
-    [PacketType.SubAck]: SubscribeResponsePacket;
-    [PacketType.UnsubAck]: UnsubscribeResponsePacket;
-    [PacketType.PingResp]: PingResponsePacket;
-    [PacketType.PingReq]: PingRequestPacket;
+  [PacketType.ConnAck]: ConnectResponsePacket;
+  [PacketType.Publish]: PublishRequestPacket;
+  [PacketType.PubAck]: PublishAckPacket;
+  [PacketType.PubRel]: PublishReleasePacket;
+  [PacketType.PubRec]: PublishReceivedPacket;
+  [PacketType.PubComp]: PublishCompletePacket;
+  [PacketType.SubAck]: SubscribeResponsePacket;
+  [PacketType.UnsubAck]: UnsubscribeResponsePacket;
+  [PacketType.PingResp]: PingResponsePacket;
+  [PacketType.PingReq]: PingRequestPacket;
 }
 
 export const DefaultPacketReadMap: PacketReadMap<DefaultPacketReadResultMap> = {
-    [PacketType.ConnAck]: readConnectResponsePacket,
-    [PacketType.Publish]: readPublishRequestPacket,
-    [PacketType.PubAck]: readPublishAckPacket,
-    [PacketType.PubRel]: readPublishReleasePacket,
-    [PacketType.PubRec]: readPublishReceivedPacket,
-    [PacketType.PubComp]: readPublishCompletePacket,
-    [PacketType.SubAck]: readSubscribeResponsePacket,
-    [PacketType.UnsubAck]: readUnsubscribePacket,
-    [PacketType.PingReq]: readPingRequestPacket,
-    [PacketType.PingResp]: readPingResponsePacket,
+  [PacketType.ConnAck]: readConnectResponsePacket,
+  [PacketType.Publish]: readPublishRequestPacket,
+  [PacketType.PubAck]: readPublishAckPacket,
+  [PacketType.PubRel]: readPublishReleasePacket,
+  [PacketType.PubRec]: readPublishReceivedPacket,
+  [PacketType.PubComp]: readPublishCompletePacket,
+  [PacketType.SubAck]: readSubscribeResponsePacket,
+  [PacketType.UnsubAck]: readUnsubscribePacket,
+  [PacketType.PingReq]: readPingRequestPacket,
+  [PacketType.PingResp]: readPingResponsePacket,
 };
