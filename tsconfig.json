@@ -10,7 +10,7 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",
-        "rootDir": "./",
+        "rootDir": "./src/",
         "declaration": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
